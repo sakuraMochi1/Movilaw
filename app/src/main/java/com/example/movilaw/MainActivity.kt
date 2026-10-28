@@ -3,45 +3,39 @@ package com.example.movilaw
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.movilaw.ui.theme.MovilawTheme
+import androidx.navigation.compose.rememberNavController
+import com.example.movilaw.data.MovilawDatabase
+import com.example.movilaw.native.NotificationHelper
+import com.example.movilaw.repository.LawRepository
+import com.example.movilaw.ui.MovilawNavigation
+import com.example.movilaw.ui.theme.LawNavyPrimary
+import com.example.movilaw.viewmodel.AuthViewModel
+import com.example.movilaw.viewmodel.MainViewModel
+import com.example.movilaw.viewmodel.ViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        // Inicialización de la persistencia (Room) y el repositorio
+        val database = MovilawDatabase.getDatabase(applicationContext)
+        val repository = LawRepository(database.userDao(), database.studyNoteDao())
+        val factory = ViewModelFactory(repository)
+
+        val authViewModel = factory.create(AuthViewModel::class.java)
+        val mainViewModel = factory.create(MainViewModel::class.java)
+
+        // Helper de recurso nativo
+        val notificationHelper = NotificationHelper(applicationContext)
+
         setContent {
-            MovilawTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+            val navController = rememberNavController()
+            MovilawNavigation(
+                navController = navController,
+                authViewModel = authViewModel,
+                mainViewModel = mainViewModel,
+                notificationHelper = notificationHelper
+            )
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MovilawTheme {
-        Greeting("Android")
     }
 }
