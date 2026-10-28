@@ -7,14 +7,21 @@ import com.example.movilaw.model.StudyNote
 import com.example.movilaw.model.User
 import com.example.movilaw.repository.LawRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: LawRepository) : ViewModel() {
 
-    // Usuario activo obtenido de Room
-    val activeUser: StateFlow<User?> = repository.activeUser as StateFlow<User?>
+    // Usuario activo obtenido de Room convertido correctamente a StateFlow
+    val activeUser: StateFlow<User?> = repository.activeUser
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     // Lista de leyes/artículos de lectura
     private val _lawsList = MutableStateFlow<List<ResourceItem>>(emptyList())
@@ -50,7 +57,7 @@ class MainViewModel(private val repository: LawRepository) : ViewModel() {
             viewModelScope.launch {
                 val newNote = StudyNote(
                     noteId = System.currentTimeMillis().toString(),
-                    relatedResourceId = resourceId,
+                    referencedLawId = resourceId,
                     noteContent = noteText,
                     creationDate = System.currentTimeMillis()
                 )
