@@ -1,6 +1,14 @@
 package com.example.movilaw.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -9,8 +17,9 @@ import com.example.movilaw.ui.screens.*
 import com.example.movilaw.viewmodel.AuthViewModel
 import com.example.movilaw.viewmodel.MainViewModel
 
-// Definición de rutas únicas para el flujo de navegación
+
 sealed class Screen(val route: String) {
+    object SessionCheck : Screen("session_check")
     object Login : Screen("login_screen")
     object Home : Screen("home_screen")
     object Contacto : Screen("contacto_screen")
@@ -27,14 +36,37 @@ fun MovilawNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.route
+        startDestination = Screen.SessionCheck.route
     ) {
+
+        composable(Screen.SessionCheck.route) {
+            val checkComplete by authViewModel.sessionCheckComplete.collectAsState()
+            val hasActiveSession by authViewModel.hasActiveSession.collectAsState()
+
+            LaunchedEffect(checkComplete, hasActiveSession) {
+                if (checkComplete) {
+                    val destination = if (hasActiveSession) Screen.Home.route else Screen.Login.route
+                    navController.navigate(destination) {
+                        popUpTo(Screen.SessionCheck.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            }
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
         composable(Screen.Login.route) {
             LoginScreen(
                 authViewModel = authViewModel,
                 onLoginSuccess = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
+                        launchSingleTop = true
                     }
                 }
             )
@@ -66,6 +98,7 @@ fun MovilawNavigation(
                 onLogout = {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(0)
+                        launchSingleTop = true
                     }
                 },
                 onBack = { navController.popBackStack() }

@@ -1,13 +1,17 @@
 package com.example.movilaw.ui.screens
 
-import androidx.compose.foundation.Image
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,13 +29,21 @@ fun ProfileScreen(
 ) {
     val activeUser by mainViewModel.activeUser.collectAsState()
 
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { _ ->
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Perfil de Usuario") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver"
+                        )
                     }
                 }
             )
@@ -44,17 +56,16 @@ fun ProfileScreen(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // REQUISITO: Al menos una Imagen
             Surface(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(120.dp)
                     .clip(CircleShape),
                 color = MaterialTheme.colorScheme.primaryContainer
             ) {
-                Image(
+                Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "Foto de perfil",
-                    modifier = Modifier.padding(16.dp)
+                    contentDescription = "Foto de perfil predeterminada",
+                    modifier = Modifier.padding(20.dp)
                 )
             }
 
@@ -71,15 +82,27 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            OutlinedButton(
+                onClick = { cameraLauncher.launch(null) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Filled.PhotoCamera, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Abrir cámara")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Button(
-                onClick = {
-                    authViewModel.logout()
-                    onLogout()
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                onClick = { authViewModel.logout(onLoggedOut = onLogout) },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                ),
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Cerrar Sesión")
             }
         }
     }
 }
+

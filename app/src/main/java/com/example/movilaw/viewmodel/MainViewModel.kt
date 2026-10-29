@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(private val repository: LawRepository) : ViewModel() {
 
-    // Usuario activo obtenido de Room convertido correctamente a StateFlow
     val activeUser: StateFlow<User?> = repository.activeUser
         .stateIn(
             scope = viewModelScope,
@@ -23,11 +22,9 @@ class MainViewModel(private val repository: LawRepository) : ViewModel() {
             initialValue = null
         )
 
-    // Lista de leyes/artículos de lectura
     private val _lawsList = MutableStateFlow<List<ResourceItem>>(emptyList())
     val lawsList: StateFlow<List<ResourceItem>> = _lawsList.asStateFlow()
 
-    // Lista de apuntes/notas personales del estudiante
     private val _notesList = MutableStateFlow<List<StudyNote>>(emptyList())
     val notesList: StateFlow<List<StudyNote>> = _notesList.asStateFlow()
 

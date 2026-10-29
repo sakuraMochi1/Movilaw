@@ -12,7 +12,6 @@ interface StudyNoteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNote(note: StudyNote)
 
-    // Recupera las notas ordenadas desde la más reciente
     @Query("SELECT * FROM study_notes ORDER BY creationDate DESC")
     fun getAllNotes(): Flow<List<StudyNote>>
 

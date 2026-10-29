@@ -22,7 +22,6 @@ fun MiEspacioScreen(
     var newNoteText by remember { mutableStateOf("") }
     var selectedNoteIdForDelete by remember { mutableStateOf<String?>(null) }
 
-    // MODAL REQUERIDO (AlertDialog)
     if (selectedNoteIdForDelete != null) {
         AlertDialog(
             onDismissRequest = { selectedNoteIdForDelete = null },

@@ -31,7 +31,7 @@ fun LoginScreen(
         if (isSuccess) onLoginSuccess()
     }
 
-    // Animación de entrada para el formulario de Login
+
     AnimatedVisibility(
         visible = true,
         enter = fadeIn() + slideInVertically()
@@ -48,7 +48,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Campo Correo Electrónico
+
             OutlinedTextField(
                 value = email,
                 onValueChange = { authViewModel.onEmailChanged(it) },
@@ -61,7 +61,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Campo Contraseña
+
             OutlinedTextField(
                 value = password,
                 onValueChange = { authViewModel.onPasswordChanged(it) },

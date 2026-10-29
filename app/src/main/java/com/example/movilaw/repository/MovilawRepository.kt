@@ -7,21 +7,11 @@ import com.example.movilaw.model.StudyNote
 import com.example.movilaw.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-
-/**
- * Repositorio central que gestiona la comunicación entre los DAOs (base de datos local)
- * y la capa de presentación (ViewModels).
- */
 class LawRepository(
     private val userDao: UserDao,
     private val studyNoteDao: StudyNoteDao
 ) {
 
-    // ==========================================
-    // GESTIÓN DE SESIÓN Y USUARIO
-    // ==========================================
-
-    // Expone el estado del usuario activo en tiempo real mediante Flow
     val activeUser: Flow<User?> = userDao.getActiveUser()
 
     suspend fun saveSession(email: String, name: String, profileType: String) {
@@ -39,11 +29,6 @@ class LawRepository(
         userDao.updateTextSize(newSize)
     }
 
-    // ==========================================
-    // GESTIÓN DE NOTAS DE ESTUDIO
-    // ==========================================
-
-    // Obtiene todas las notas personales guardadas en la base de datos local
     fun getAllStudyNotes(): Flow<List<StudyNote>> {
         return studyNoteDao.getAllNotes()
     }
@@ -56,14 +41,6 @@ class LawRepository(
         studyNoteDao.deleteNoteById(noteId)
     }
 
-    // ==========================================
-    // GESTIÓN DE LEGISLACIÓN (MOCKS PARA EL MVP)
-    // ==========================================
-
-    /**
-     * Simula la obtención de un catálogo de normativas actualizadas.
-     * El caso permite el uso de datos de prueba o mocks para representar la consulta jurídica.
-     */
     fun getMockLegislation(): Flow<List<ResourceItem>> = flow {
         val mockData = listOf(
             ResourceItem(

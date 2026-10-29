@@ -5,13 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movilaw.repository.LawRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AuthViewModel(private val repository: LawRepository) : ViewModel() {
 
-    // Campos del formulario
+
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email.asStateFlow()
 
@@ -21,16 +22,31 @@ class AuthViewModel(private val repository: LawRepository) : ViewModel() {
     private val _profileType = MutableStateFlow("Estudiante")
     val profileType: StateFlow<String> = _profileType.asStateFlow()
 
-    // Mensajes de error para la UI
+
     private val _emailError = MutableStateFlow<String?>(null)
     val emailError: StateFlow<String?> = _emailError.asStateFlow()
 
     private val _passwordError = MutableStateFlow<String?>(null)
     val passwordError: StateFlow<String?> = _passwordError.asStateFlow()
 
-    // Estado para controlar la redirección tras un login exitoso
+
     private val _isLoginSuccess = MutableStateFlow(false)
     val isLoginSuccess: StateFlow<Boolean> = _isLoginSuccess.asStateFlow()
+
+
+    private val _sessionCheckComplete = MutableStateFlow(false)
+    val sessionCheckComplete: StateFlow<Boolean> = _sessionCheckComplete.asStateFlow()
+
+    private val _hasActiveSession = MutableStateFlow(false)
+    val hasActiveSession: StateFlow<Boolean> = _hasActiveSession.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            val savedUser = repository.activeUser.first()
+            _hasActiveSession.value = savedUser != null
+            _sessionCheckComplete.value = true
+        }
+    }
 
     fun onEmailChanged(input: String) {
         _email.value = input
@@ -58,7 +74,7 @@ class AuthViewModel(private val repository: LawRepository) : ViewModel() {
         val currentEmail = _email.value
         val currentPassword = _password.value
 
-        // Validación final antes de procesar el registro/login
+
         var isValid = true
 
         if (currentEmail.isBlank() || !Patterns.EMAIL_ADDRESS.matcher(currentEmail).matches()) {
@@ -73,21 +89,26 @@ class AuthViewModel(private val repository: LawRepository) : ViewModel() {
 
         if (isValid) {
             viewModelScope.launch {
-                // Guarda la sesión en Room utilizando el repositorio
+
                 repository.saveSession(
                     email = currentEmail,
                     name = currentEmail.substringBefore("@").replaceFirstChar { it.uppercase() },
                     profileType = _profileType.value
                 )
+                _hasActiveSession.value = true
                 _isLoginSuccess.value = true
             }
         }
     }
 
-    fun logout() {
+    fun logout(onLoggedOut: () -> Unit = {}) {
         viewModelScope.launch {
+
             repository.clearSession()
+            _hasActiveSession.value = false
             _isLoginSuccess.value = false
+            _password.value = ""
+            onLoggedOut()
         }
     }
 }
