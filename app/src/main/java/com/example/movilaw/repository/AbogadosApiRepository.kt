@@ -10,9 +10,9 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-class AbogadosApiRepository {
+class AbogadosApiRepository : AbogadosRepository {
 
-    suspend fun getAbogados(): List<Abogado> =
+    override suspend fun getAbogados(): List<Abogado> =
         withContext(Dispatchers.IO) {
 
             val url = URL(
@@ -63,7 +63,7 @@ class AbogadosApiRepository {
             }
         }
 
-    suspend fun crearAbogado(
+    override suspend fun crearAbogado(
         nombreAbogado: String,
         rut: Long,
         numeroCaso: Int,

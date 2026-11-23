@@ -1,18 +1,17 @@
-
-
 package com.example.movilaw.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movilaw.model.Abogado
 import com.example.movilaw.repository.AbogadosApiRepository
+import com.example.movilaw.repository.AbogadosRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AbogadosViewModel(
-    private val repository: AbogadosApiRepository = AbogadosApiRepository()
+    private val repository: AbogadosRepository = AbogadosApiRepository()
 ) : ViewModel() {
 
     private val _abogados = MutableStateFlow<List<Abogado>>(emptyList())
