@@ -29,7 +29,8 @@ fun HomeScreen(
     notificationHelper: NotificationHelper,
     onNavigateToContacto: () -> Unit,
     onNavigateToMiEspacio: () -> Unit,
-    onNavigateToProfile: () -> Unit
+    onNavigateToProfile: () -> Unit,
+    onNavigateToAbogados: () -> Unit
 ) {
     val laws by mainViewModel.lawsList.collectAsState()
     var capturedPhoto by remember { mutableStateOf<Bitmap?>(null) }
@@ -83,6 +84,7 @@ fun HomeScreen(
                 Button(onClick = onNavigateToMiEspacio) { Text("Mi Espacio") }
                 Button(onClick = onNavigateToContacto) { Text("Contacto") }
                 Button(onClick = onNavigateToProfile) { Text("Perfil") }
+                Button(onClick = onNavigateToAbogados) { Text("Abogados") }
             }
 
             Spacer(modifier = Modifier.height(12.dp))

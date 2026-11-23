@@ -16,6 +16,7 @@ import com.example.movilaw.native.NotificationHelper
 import com.example.movilaw.ui.screens.*
 import com.example.movilaw.viewmodel.AuthViewModel
 import com.example.movilaw.viewmodel.MainViewModel
+import com.example.movilaw.viewmodel.AbogadosViewModel
 
 
 sealed class Screen(val route: String) {
@@ -25,6 +26,7 @@ sealed class Screen(val route: String) {
     object Contacto : Screen("contacto_screen")
     object MiEspacio : Screen("mi_espacio_screen")
     object Profile : Screen("profile_screen")
+    object Abogados : Screen("abogados_screen")
 }
 
 @Composable
@@ -32,12 +34,22 @@ fun MovilawNavigation(
     navController: NavHostController,
     authViewModel: AuthViewModel,
     mainViewModel: MainViewModel,
-    notificationHelper: NotificationHelper
+    notificationHelper: NotificationHelper,
+    abogadosViewModel: AbogadosViewModel
 ) {
     NavHost(
         navController = navController,
         startDestination = Screen.SessionCheck.route
     ) {
+
+        composable(Screen.Abogados.route) {
+            AbogadosScreen(
+                viewModel = abogadosViewModel,
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
 
         composable(Screen.SessionCheck.route) {
             val checkComplete by authViewModel.sessionCheckComplete.collectAsState()
@@ -77,7 +89,8 @@ fun MovilawNavigation(
                 notificationHelper = notificationHelper,
                 onNavigateToContacto = { navController.navigate(Screen.Contacto.route) },
                 onNavigateToMiEspacio = { navController.navigate(Screen.MiEspacio.route) },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
+                onNavigateToAbogados = {navController.navigate(Screen.Abogados.route) }
             )
         }
         composable(Screen.Contacto.route) {

@@ -11,6 +11,7 @@ import com.example.movilaw.ui.MovilawNavigation
 import com.example.movilaw.viewmodel.AuthViewModel
 import com.example.movilaw.viewmodel.MainViewModel
 import com.example.movilaw.viewmodel.ViewModelFactory
+import com.example.movilaw.viewmodel.AbogadosViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,6 +21,7 @@ class MainActivity : ComponentActivity() {
         val database = MovilawDatabase.getDatabase(applicationContext)
         val repository = LawRepository(database.userDao(), database.studyNoteDao())
         val factory = ViewModelFactory(repository)
+        val abogadosViewModel = AbogadosViewModel()
 
         val authViewModel = factory.create(AuthViewModel::class.java)
         val mainViewModel = factory.create(MainViewModel::class.java)
@@ -33,7 +35,8 @@ class MainActivity : ComponentActivity() {
                 navController = navController,
                 authViewModel = authViewModel,
                 mainViewModel = mainViewModel,
-                notificationHelper = notificationHelper
+                notificationHelper = notificationHelper,
+                abogadosViewModel = abogadosViewModel
             )
         }
     }
